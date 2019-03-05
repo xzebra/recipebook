@@ -29,7 +29,6 @@ void setup(void) {
     WiFi.mode(WIFI_STA);
     Serial.println("");
     WiFi.begin(ssid.c_str(), password.c_str());
-    
 
     // Wait for connection
     while (WiFi.status() != WL_CONNECTED) {
@@ -40,6 +39,8 @@ void setup(void) {
     
     Serial.print("Connected to ");
     Serial.println(ssid);
+
+    databaseInit();
 
     server.begin();
     Serial.println("HTTP server started");

@@ -1,4 +1,3 @@
-#include <ESP8266WiFi.h>
 #include <SD.h>
 
 const int BUFFER_LEN = 1024;
