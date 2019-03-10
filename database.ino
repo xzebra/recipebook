@@ -1,80 +1,38 @@
-#include <EDB.h>
 #include <SD.h>
+typedef recipe_t Recipe;
 
-const int MAX_INGREDIENTS = 25;
-const int MAX_INGREDIENT_LEN = 30;
-const int MAX_STEPS = 20;
-const int MAX_STEP_LEN = 140;
-
-struct Recipe {
-    String name;
-    bool done;
-    int people;
-    char ingredients[MAX_INGREDIENTS][MAX_INGREDIENT_LEN];
-    char steps[MAX_STEPS][MAX_STEP_LEN];
-};
-
-const int MAX_DATABASE_ELEMS = 200;
-const unsigned long TABLE_SIZE = sizeof(Recipe)*MAX_DATABASE_ELEMS;
-
-enum Section {arroz, ensalada, pasta, verdura, sopa, legumbres, carne, pescado, postre};
-
-EDB db(&writer, &reader);
-File database;
-char* db_name = "/db/recipes.db";
-
-void writer(unsigned long address, byte data) {
-    database.seek(address);
-    database.write(data);
-    database.flush();
-}
-
-byte reader(unsigned long address) {
-    database.seek(address);
-    byte b = database.read();
-    return b;
-}
-
-void createTable() {
-    Serial.print("Creating new table... ");
-    // create table with starting address 0
-    db.create(0, TABLE_SIZE, (unsigned int)sizeof(Recipe));
-}
-
-void openDatabase() {
-    database = SD.open(db_name, FILE_WRITE);
-}
+char* db_folder = "/db/";
 
 void databaseInit() {
     // Check dir for db files
-    if (!SD.exists("/db")) {
-        Serial.println("Dir for Db files does not exist, creating...");
-        SD.mkdir("/db");
+    if (!SD.exists(db_folder)) {
+        Serial.println("Dir for db files does not exist, creating...");
+        SD.mkdir(db_folder);
     }
+}
 
-    if (SD.exists(db_name)) {
-        // Sometimes it wont open at first attempt, espessialy after cold start
-        // Let's try one more time
-        openDatabase();
-        if (!database) {
-            openDatabase();
-        }
+void storeName(File &db, const char name[]) {
+    db.write((uint8_t*)name, MAX_NAME_LEN);
+}
 
-        if (database) {
-            Serial.print("Openning current table... ");
-            EDB_Status result = db.open(0);
-            if (result != EDB_OK) {
-                Serial.println("ERROR");
-                Serial.println("Did not find database in the file " + String(db_name));
-                createTable();
-            }
-            Serial.println("DONE");
-        } else {
-            Serial.println("Could not open file " + String(db_name));
-        }
-    } else {
-        openDatabase();
-        createTable();
-        Serial.println("DONE");
+void storePeople(File &db, const int people) {
+    db.write((uint8_t*)&people, sizeof(people)/sizeof(uint8_t));
+}
+
+void storeIngredient(File &db, char ingredient[MAX_INGREDIENT_LEN]) {
+    db.write((uint8_t*)ingredient, MAX_INGREDIENT_LEN);
+}
+
+void storeSteps(File &db, char steps[][MAX_STEP_LEN]) {
+    db.write((uint8_t*)steps, MAX_STEPS*MAX_STEP_LEN);
+}
+
+bool readRecipe(const String &file_name, recipe_t &recipe) {
+    File db_file = SD.open(file_name+String(db_folder), FILE_WRITE);
+    if(!db_file) {
+        Serial.println("File doesn't exist");
+        return false;
     }
+    db_file.read((uint8_t*)&recipe, sizeof(Recipe)/sizeof(uint8_t));
+    return true;
 }

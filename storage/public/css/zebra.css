@@ -356,7 +356,7 @@ Single styles
 	outline: none; 
 }
 
-input[type="text"], input[type="password"], select {
+input[type="text"], input[type="password"], textarea, select {
 	width:80%;
 	display: block;
 	padding: .5em 1em;

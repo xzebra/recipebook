@@ -20,13 +20,13 @@ String parseDataType(String path) {
     return dataType;
 }
 
-String getURI(String request, int index) {
+String split(String request, int index, const char delim) {
     int found = 0;
     int strIndex[] = {0, -1};
     int maxIndex = request.length() - 1;
 
     for (int i = 0; i <= maxIndex && found <= index; i++) {
-        if (request.charAt(i) == ' ' || i == maxIndex) {
+        if (request.charAt(i) == delim || i == maxIndex) {
             found++;
             strIndex[0] = strIndex[1] + 1;
             strIndex[1] = (i == maxIndex) ? i + 1 : i;
@@ -38,4 +38,13 @@ String getURI(String request, int index) {
 
 String removeLastChar(String from) {
     return from.substring(0, from.length()-1);
+}
+
+int toInt(const char* input) {
+    int r = 0;
+    for(int i = 0; input[i] != '\0'; ++i) {
+        r *= 10;
+        r += input[i]-'0';
+    }
+    return r;
 }
