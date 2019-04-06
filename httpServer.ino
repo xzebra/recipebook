@@ -60,10 +60,13 @@ void handleNotFound(WiFiClient &client) {
     client.println("");
 }
 
-int handlePostRequest(WiFiClient &client, String &uri) {
-    // TODO: split the function for other POST utilities
+void handleAddRecipe(WiFiClient &client) {
     Serial.println("Handling add recipe");
-    File db_file = SD.open(String(db_folder)+"0.dat", FILE_WRITE);
+
+    char recipe_file_name[DB_FOLDER_LEN + KEY_LEN + 5];
+    generateID(recipe_file_name);
+
+    File db_file = SD.open(recipe_file_name, FILE_WRITE);
 
     while(client.available())
         if(client.readStringUntil('\r') == "\n")
@@ -71,24 +74,61 @@ int handlePostRequest(WiFiClient &client, String &uri) {
     
     if(db_file) {
         Serial.println("File created");
-        char garbage[MAX_GARBAGE_LEN];
-        client.readBytesUntil('=', garbage, MAX_GARBAGE_LEN);
+        Serial.println(recipe_file_name);
+
+        const int MAX_BUFFER_LEN = 200;
+        char buffer[MAX_BUFFER_LEN+1];
+        client.readBytesUntil('=', buffer, MAX_BUFFER_LEN);
         
-        char name_atrib[MAX_NAME_LEN];
-        client.readBytesUntil('&', name_atrib, MAX_NAME_LEN);
-        storeName(db_file, name_atrib);
-        Serial.println(name_atrib);
+        int end_pos = client.readBytesUntil('&', buffer, MAX_NAME_LEN);
+        buffer[end_pos+1] = '\0';
+        storeName(db_file, buffer);
+        Serial.println(buffer);
 
         int people_atrib = client.parseInt();
         storePeople(db_file, people_atrib);
         Serial.println(people_atrib);
 
-        char ingredients[MAX_INGREDIENTS][MAX_INGREDIENT_LEN];
+        //char ingredients[MAX_INGREDIENTS][MAX_INGREDIENT_LEN];
         
         
-        char steps[MAX_STEPS][MAX_STEP_LEN];
+        //char steps[MAX_STEPS][MAX_STEP_LEN];
         
         db_file.close();
+    }
+}
+
+int handleListRecipes(WiFiClient &client) {
+    client.println("HTTP/1.1 200 Success");
+    client.println("Content-Type: text/plain");
+    client.println();
+
+    File db = SD.open("db/");
+    if(!db) return ERR_NOTFOUND;
+    db = db.openNextFile();
+
+    char buffer[MAX_NAME_LEN+1];
+    while(db) {
+        Serial.println(db.name());
+        readName(db, buffer);
+        Serial.println(buffer);
+        //client.println(buffer);
+        db = db.openNextFile();
+    }
+
+    return NO_ERR;
+}
+
+int handleGetRequest(WiFiClient &client, String &uri) {
+    if(uri == "/list")
+        return handleListRecipes(client);
+
+    return sendFromSDCard(client, uri);
+}
+
+int handlePostRequest(WiFiClient &client, String &uri) {
+    if(uri == "/add.htm") {
+        handleAddRecipe(client);
     }
     return sendFromSDCard(client, uri);
 }
@@ -102,7 +142,7 @@ void handleRequest(WiFiClient &client) {
     if (requestURI.indexOf("..") != -1)
         error = ERR_FORBIDDEN;
     else if(requestType == "GET")
-        error = sendFromSDCard(client, requestURI);
+        error = handleGetRequest(client, requestURI);
     else if(requestType == "POST")
         error = handlePostRequest(client, requestURI);
     

@@ -11,6 +11,7 @@ const int MAX_INGREDIENT_LEN = 40;
 const int MAX_STEPS = 20;
 const int MAX_STEP_LEN = 140;
 
+/*
 enum Section {arroz, ensalada, pasta, verdura, sopa, legumbres, carne, pescado, postre};
 
 struct recipe_t {
@@ -19,6 +20,7 @@ struct recipe_t {
     char ingredients[MAX_INGREDIENTS][MAX_INGREDIENT_LEN];
     char steps[MAX_STEPS][MAX_STEP_LEN];
 };
+*/
 
 WiFiServer server(80);
 const int led = LED_BUILTIN;
@@ -56,6 +58,7 @@ void setup(void) {
     Serial.println(ssid);
 
     databaseInit();
+    randomSeed(analogRead(A0));
 
     //server.on("/add", HTTP_POST, handleAddRecipe);
     //server.onNotFound(handleClient);

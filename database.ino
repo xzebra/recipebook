@@ -1,7 +1,8 @@
 #include <SD.h>
-typedef recipe_t Recipe;
 
 char* db_folder = "/db/";
+const int DB_FOLDER_LEN = 4;
+const int KEY_LEN = 5;
 
 void databaseInit() {
     // Check dir for db files
@@ -11,28 +12,51 @@ void databaseInit() {
     }
 }
 
+// Requires a <dest_key> array of length len(db_folder) + KEY_LEN + ".dat"
+void generateID(char dest_key[]) {
+    strcpy(dest_key, db_folder);
+    strcat(dest_key, "aaaaa");
+    strcat(dest_key, ".dat");
+
+    bool file_exists = true;
+    while(file_exists) {
+        // generate base64 key {0-9a-zA-z}
+        for(int i = DB_FOLDER_LEN; i < KEY_LEN+DB_FOLDER_LEN; ++i) {
+            char random_char = '0';
+            switch(random(0,3)) { // choose char
+                case 0: // number
+                    random_char += random(0, 10);
+                    break;
+                case 1: // lowercase letter
+                    random_char = 'a' + random(0, 26);
+                    break;
+                case 2: // uppercase letter
+                    random_char = 'A' + random(0, 26);
+                    break;   
+            }
+            dest_key[i] = random_char;
+        }
+
+        file_exists = SD.exists(dest_key);
+    }
+}
+
 void storeName(File &db, const char name[]) {
-    db.write((uint8_t*)name, MAX_NAME_LEN);
+    db.write(name, MAX_NAME_LEN);
+}
+
+void readName(File &db, char name[]) {
+    db.readBytes(name, MAX_NAME_LEN);
 }
 
 void storePeople(File &db, const int people) {
     db.write((uint8_t*)&people, sizeof(people)/sizeof(uint8_t));
 }
 
-void storeIngredient(File &db, char ingredient[MAX_INGREDIENT_LEN]) {
-    db.write((uint8_t*)ingredient, MAX_INGREDIENT_LEN);
+void storeIngredient(File &db, const char ingredient[]) {
+    db.write(ingredient, MAX_INGREDIENT_LEN);
 }
 
-void storeSteps(File &db, char steps[][MAX_STEP_LEN]) {
-    db.write((uint8_t*)steps, MAX_STEPS*MAX_STEP_LEN);
-}
-
-bool readRecipe(const String &file_name, recipe_t &recipe) {
-    File db_file = SD.open(file_name+String(db_folder), FILE_WRITE);
-    if(!db_file) {
-        Serial.println("File doesn't exist");
-        return false;
-    }
-    db_file.read((uint8_t*)&recipe, sizeof(Recipe)/sizeof(uint8_t));
-    return true;
+void storeStep(File &db, char step[]) {
+    db.write(step, MAX_STEP_LEN);
 }
