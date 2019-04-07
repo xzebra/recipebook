@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Recetario</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/zebra.css">
+    <link rel="stylesheet" href="css/hamb.css">
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet" type="text/css">
+    <style>
+        h3 {
+            font-weight: 900;
+            display:inline-block;
+            margin-bottom: 1em;
+            margin-right:1em;
+        }
+        span.dato {
+            display:inline-block;
+            margin-bottom: 2em;
+            text-align: right;
+        }
+        span.inline {
+            width:50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="container">
+                <h1 class="header-heading"><a href="index.htm">Recetario</a></h1>
+                <nav id="hamburger" class="hamburger">
+                    <div class="lines"></div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- nav bar -->
+        <div id="menu-bar" class="nav-bar">
+            <div class="container">
+                <ul class="nav">
+                    <li id=""><a href="index.htm">Home</a></li>
+                    <li id="right"><a href="add.htm">Añadir</a></li>
+                    <li id="right"><a href="list.htm">Listado</a></li>
+                    <li id="right"><a href="/rnd">Aleatoria</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- end -->
+
+        <div class="content">
+            <div class="container">
+                <div class="main">
+                    <h1>Ver receta</h1>
+                    <hr>
+                    <!-- Párrafos -->
+                    <h3>Nombre:</h3>
+                    <span id="data0" class="dato"></span>
+                    <br>
+
+                    <h3>Comensales:</h3>
+                    <span id="data1" class="dato"></span>
+                    <br>
+
+                    <h3>Ingredientes:</h3>
+                    <span id="data2" class="dato"></span>
+                    <br>
+
+                    <h3>Pasos:</h3>
+                    <span id="data3" class="dato"></span>
+                    <br>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="container">
+                Hecho con <span style="color:red">❤</span> por <a href="http://github.com/xzebra">Jorge</a>
+            </div>
+        </div>
+    </div>
+    <script src="js/hamb.js"></script>
+    <script src="js/http.js"></script>
+    <script>
+        let url = new URL(window.location.href);
+        let id = url.searchParams.get("id");
+        httpGet("/view/"+id, function(text) {
+            let recipe = text.split(" ");
+            for(let i = 0; i < recipe.length; i++) {
+                let data_span = document.getElementById("data"+i);
+                data_span.innerText = postDecode(recipe[i]);
+            }
+        });
+    </script>
+</body>
+
+</html>

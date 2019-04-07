@@ -3,21 +3,31 @@ String appendIndexIfRoot(String path) {
     return path;
 }
 
-String parseDataType(String path) {
-    String dataType = "text/plain";
-    if (path.endsWith(".htm"))
-        dataType = "text/html; charset=utf-8";
-    else if (path.endsWith(".css"))
-        dataType = "text/css; charset=utf-8";
-    else if (path.endsWith(".js"))
-        dataType = "application/javascript";
-    else if (path.endsWith(".html"))
-        dataType = "image/png";
-    else if (path.endsWith(".html"))
-        dataType = "image/gif";
-    else if (path.endsWith(".html"))
-        dataType = "image/jpeg";
-    return dataType;
+String parseDataType(String filename) {
+    if (filename.endsWith(".htm")) {
+        return "text/html; charset=utf-8";
+    } else if (filename.endsWith(".css")) {
+        return "text/css; charset=utf-8";
+    } else if (filename.endsWith(".js")) {
+        return "application/javascript; charset=utf-8";
+    } else if (filename.endsWith(".png")) {
+        return "image/png";
+    } else if (filename.endsWith(".gif")) {
+        return "image/gif";
+    } else if (filename.endsWith(".jpg")) {
+        return "image/jpeg";
+    } else if (filename.endsWith(".ico")) {
+        return "image/x-icon";
+    } else if (filename.endsWith(".xml")) {
+        return "text/xml";
+    } else if (filename.endsWith(".pdf")) {
+        return "application/x-pdf";
+    } else if (filename.endsWith(".zip")) {
+        return "application/x-zip";
+    } else if (filename.endsWith(".gz")) {
+        return "application/x-gzip";
+    }
+    return "text/plain; charset=utf-8";
 }
 
 String split(String request, int index, const char delim) {
@@ -37,14 +47,14 @@ String split(String request, int index, const char delim) {
 }
 
 String removeLastChar(String from) {
-    return from.substring(0, from.length()-1);
+    return from.substring(0, from.length() - 1);
 }
 
 int toInt(const char* input) {
     int r = 0;
-    for(int i = 0; input[i] != '\0'; ++i) {
+    for (int i = 0; input[i] != '\0'; ++i) {
         r *= 10;
-        r += input[i]-'0';
+        r += input[i] - '0';
     }
     return r;
 }

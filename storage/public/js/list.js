@@ -29,7 +29,7 @@ httpGet("/list", function(text) {
             }
 
             list.innerHTML += `
-                <tr id=\"{0}\">
+                <tr id=\"{0}\" onclick="document.location.href = '/view.htm?id={0}'">
                     <td data-title="Nombre">{1}</td>
                     <td data-title="Comensales">{2}</td>
                     <td data-title="Ingredientes">{3}</td>
@@ -39,14 +39,14 @@ httpGet("/list", function(text) {
     });
 });
 
-function filter() {
+function filter(input_id) {
     var input, filter, table, tr, td, i;
     
     table = document.getElementById("target_table");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
         for(let id = 0; id < 3; id++) {
-            input = document.getElementById("in"+id);
+            input = document.getElementById(input_id+id);
             filter = input.value.toUpperCase();
             
             td = tr[i].getElementsByTagName("td")[id];
@@ -59,6 +59,18 @@ function filter() {
                     tr[i].style.display = "";
                 }
             }
+        }
+    }
+}
+
+function filter_change() {
+    let select = document.getElementById("filter_select").value;
+    for(let i = 0; i < 4; i++) {
+        let input = document.getElementById("in_filter"+i);
+        if(i == select) {
+            input.style.display = "inline-block";
+        } else {
+            input.style.display = "none";
         }
     }
 }
