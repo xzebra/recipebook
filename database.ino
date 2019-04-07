@@ -2,7 +2,7 @@
 
 char* db_folder = "/db/";
 const int DB_FOLDER_LEN = 4;
-const int KEY_LEN = 5;
+const int KEY_LEN = 8;
 
 void databaseInit() {
     // Check dir for db files
@@ -15,24 +15,20 @@ void databaseInit() {
 // Requires a <dest_key> array of length len(db_folder) + KEY_LEN + ".dat"
 void generateID(char dest_key[]) {
     strcpy(dest_key, db_folder);
-    strcat(dest_key, "aaaaa");
+    strcat(dest_key, "aaaaaaaa");
     strcat(dest_key, ".dat");
 
     bool file_exists = true;
     while(file_exists) {
-        // generate base64 key {0-9a-zA-z}
         for(int i = DB_FOLDER_LEN; i < KEY_LEN+DB_FOLDER_LEN; ++i) {
             char random_char = '0';
-            switch(random(0,3)) { // choose char
-                case 0: // number
+            switch(random(0,2)) { // choose char
+                case 0: // numbers
                     random_char += random(0, 10);
                     break;
-                case 1: // lowercase letter
-                    random_char = 'a' + random(0, 26);
-                    break;
-                case 2: // uppercase letter
+                case 1: // letters
                     random_char = 'A' + random(0, 26);
-                    break;   
+                    break;
             }
             dest_key[i] = random_char;
         }
@@ -50,7 +46,13 @@ void readName(File &db, char name[]) {
 }
 
 void storePeople(File &db, const int people) {
-    db.write((uint8_t*)&people, sizeof(people)/sizeof(uint8_t));
+    db.write((char*)&people, sizeof(people)/sizeof(char));
+}
+
+int readPeople(File &db) {
+    int people = 0;
+    db.readBytes((char*)&people, sizeof(people)/sizeof(char));
+    return people;
 }
 
 void storeIngredient(File &db, const char ingredient[]) {

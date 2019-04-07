@@ -81,39 +81,41 @@ void handleAddRecipe(WiFiClient &client) {
         client.readBytesUntil('=', buffer, MAX_BUFFER_LEN);
         
         int end_pos = client.readBytesUntil('&', buffer, MAX_NAME_LEN);
-        buffer[end_pos+1] = '\0';
+        buffer[end_pos] = '\0';
         storeName(db_file, buffer);
         Serial.println(buffer);
 
         int people_atrib = client.parseInt();
         storePeople(db_file, people_atrib);
         Serial.println(people_atrib);
-
-        //char ingredients[MAX_INGREDIENTS][MAX_INGREDIENT_LEN];
-        
-        
-        //char steps[MAX_STEPS][MAX_STEP_LEN];
-        
+        //char ingredients[MAX_INGREDIENTS][MAX_INGREDIENT_LEN];        
+        //char steps[MAX_STEPS][MAX_STEP_LEN];      
         db_file.close();
     }
 }
 
 int handleListRecipes(WiFiClient &client) {
     client.println("HTTP/1.1 200 Success");
-    client.println("Content-Type: text/plain");
+    client.println("Content-Type: text/html");
     client.println();
 
-    File db = SD.open("db/");
+    File db = SD.open("DB/");
     if(!db) return ERR_NOTFOUND;
-    db = db.openNextFile();
 
     char buffer[MAX_NAME_LEN+1];
-    while(db) {
-        Serial.println(db.name());
-        readName(db, buffer);
-        Serial.println(buffer);
-        //client.println(buffer);
-        db = db.openNextFile();
+    File db_file = db.openNextFile();
+    while(db_file) {
+        client.print(db_file.name());
+        client.print(" ");
+
+        readName(db_file, buffer);
+        client.print(buffer);
+        client.print(" ");
+
+        client.print(readPeople(db_file));
+        client.println();
+
+        db_file = db.openNextFile();
     }
 
     return NO_ERR;

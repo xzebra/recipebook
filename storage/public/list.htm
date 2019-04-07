@@ -3,22 +3,40 @@
   <head>
     <meta charset="utf-8">
     <title>Recetario</title>
-    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/zebra.css">
+    <link rel="stylesheet" href="css/hamb.css">
     <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet" type="text/css">
+    <style>
+        input[type="text"] {
+            width: 100%;
+            padding: 0;
+            margin:0;
+            font-weight: 400 !important;
+            font: 1em/1.2 "Helvetica Neue", Helvetica, Arial, Geneva, sans-serif;
+            font-family: 'Comfortaa', cursive;
+            border:0;
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border:0;
+        }
+    </style>
   </head>
   <body>
       <div class="wrapper">
         <div class="header">
           <div class="container">
             <h1 class="header-heading"><a href="index.htm">Recetario</a></h1>
+            <nav id="hamburger" class="hamburger">
+                <div class="lines"></div>
+              </nav>
           </div>
         </div>
 
         <!-- nav bar -->
-        <div class="nav-bar">
+        <div id="menu-bar" class="nav-bar">
           <div class="container">
             <ul class="nav">
               <li id=""><a href="index.htm">Home</a></li>
@@ -36,11 +54,18 @@
                 <h1>Listado</h1>
                 <hr>
                 <!-- Párrafos -->
-                <h3>Lorem ipsum</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui dicta minus molestiae vel beatae natus eveniet ratione temporibus aperiam harum alias officiis assumenda officia quibusdam deleniti eos cupiditate dolore doloribus!</p>
-                <p>Ad dolore dignissimos asperiores dicta facere optio quod commodi nam tempore recusandae. Rerum sed nulla eum vero expedita ex delectus voluptates rem at neque quos facere sequi unde optio aliquam!</p>
-                <p>Tenetur quod quidem in voluptatem corporis dolorum dicta sit pariatur porro quaerat autem ipsam odit quam beatae tempora quibusdam illum! Modi velit odio nam nulla unde amet odit pariatur at!</p>
-                <p>Consequatur rerum amet fuga expedita sunt et tempora saepe? Iusto nihil explicabo perferendis quos provident delectus ducimus necessitatibus reiciendis optio tempora unde earum doloremque commodi laudantium ad nulla vel odio?</p>
+                <table class="box-shadow">
+                  <thead>
+                    <tr>
+                        <th><input id="in0" type="text" placeholder="Nombre" onkeyup="filter();"></th>
+                        <th><input id="in1" type="text" placeholder="Comensales" onkeyup="filter();"></th>
+                        <th><input id="in2" type="text" placeholder="Ingredientes" onkeyup="filter();"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="target_table">
+                    
+                  </tbody>
+                </table>
                 <br>
 
               </div>
@@ -53,5 +78,8 @@
             </div>
           </div>
       </div>
+      <script src="js/http.js"></script>
+      <script src="js/list.js"></script>
+      <script src="js/hamb.js"></script>
   </body>
 </html>
