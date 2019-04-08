@@ -9,5 +9,6 @@ function httpGet(url, callback) {
 }
 
 function postDecode(post_text) {
+    post_text = decodeURIComponent(post_text);
     return post_text.replace(/\+/g, " ");
 }

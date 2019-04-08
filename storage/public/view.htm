@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/zebra.css">
     <link rel="stylesheet" href="css/hamb.css">
     <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" type="image/png" href="https://i.imgur.com/bGHVJep.png"/>
     <style>
         h3 {
             font-weight: 900;
@@ -72,6 +73,8 @@
                     <h3>Pasos:</h3>
                     <span id="data3" class="dato"></span>
                     <br>
+
+                    <input type="submit" id="del_btn" value="Eliminar" class="pushy__btn" style="width: 7em;margin-bottom: 2em;">
                 </div>
             </div>
         </div>
@@ -93,7 +96,13 @@
                 let data_span = document.getElementById("data"+i);
                 data_span.innerText = postDecode(recipe[i]);
             }
-        });
+            document.getElementById("del_btn").onclick = function() {
+                httpGet("/del/"+id, function(text){
+                    alert("La receta ha sido eliminada");
+                    document.location.href = "/list.htm";
+                });
+            };
+        });      
     </script>
 </body>
 

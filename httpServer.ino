@@ -76,23 +76,31 @@ void handleAddRecipe(WiFiClient &client) {
             break;
     
     if(db_file) {
-        Serial.println("File created");
+        Serial.print("File created ");
         Serial.println(recipe_file_name);
 
-        const int MAX_BUFFER_LEN = 200;
-        char buffer[MAX_BUFFER_LEN+1];
+        const int MAX_BUFFER_LEN = MAX_STEP_LEN*MAX_STEPS;
+        char buffer[MAX_BUFFER_LEN];
+
         client.readBytesUntil('=', buffer, MAX_BUFFER_LEN);
-        
         int end_pos = client.readBytesUntil('&', buffer, MAX_NAME_LEN);
         buffer[end_pos] = '\0';
         storeName(db_file, buffer);
-        Serial.println(buffer);
 
         int people_atrib = client.parseInt();
         storePeople(db_file, people_atrib);
-        Serial.println(people_atrib);
-        //char ingredients[MAX_INGREDIENTS][MAX_INGREDIENT_LEN];        
-        //char steps[MAX_STEPS][MAX_STEP_LEN];      
+
+        // n=Pollo+con+arroz+y+tomate&p=2&i=pollo%2C+tomate%2C+arroz&s=Cocinalo
+        client.readBytesUntil('=', buffer, MAX_BUFFER_LEN);
+        end_pos = client.readBytesUntil('&', buffer, MAX_BUFFER_LEN);
+        buffer[end_pos] = '\0';
+        storeIngredients(db_file, buffer);
+
+        client.readBytesUntil('=', buffer, MAX_BUFFER_LEN);
+        end_pos = client.readBytes(buffer, MAX_BUFFER_LEN);
+        buffer[end_pos] = '\0';
+        storeSteps(db_file, buffer);
+
         db_file.close();
     }
 }
@@ -175,7 +183,7 @@ int handleViewRecipe(WiFiClient &client, String &uri) {
     File db_file = SD.open("DB/"+filename);
     if(!db_file) return ERR_NOTFOUND;
 
-    char buffer[MAX_NAME_LEN+1];
+    char buffer[MAX_STEPS*MAX_STEP_LEN];
     readName(db_file, buffer);
     client.print(buffer);
     client.print(" ");
@@ -183,12 +191,33 @@ int handleViewRecipe(WiFiClient &client, String &uri) {
     client.print(readPeople(db_file));
     client.print(" ");
 
-    client.print("tomate,pechuga,ajo");
+    readIngredients(db_file, buffer);
+    client.print(buffer);
     client.print(" ");
 
-    client.print("pues+lo+cocinas+nen");
+    readSteps(db_file, buffer);
+    client.print(buffer);
 
     db_file.close();
+    return NO_ERR;
+}
+
+int handleDelRecipe(WiFiClient &client, String &uri) {
+    String filename = uri.substring(5);
+    if(filename.indexOf("..") != -1 || 
+        filename.indexOf("/") != -1 || 
+        filename.indexOf("\\") != -1) {
+            return ERR_FORBIDDEN;
+    }
+
+    if(SD.remove("DB/"+filename)) {
+        client.println("HTTP/1.1 200 Success");
+        client.println("Content-Type: text/html");
+        client.println();
+    } else {
+        return ERR_NOTFOUND;
+    }
+
     return NO_ERR;
 }
 
@@ -207,6 +236,8 @@ int handleGetRequest(WiFiClient &client, String &uri) {
         return handleRandomRecipe(client);
     else if(uri.substring(0, 6) == "/view/")
         return handleViewRecipe(client, uri);
+    else if(uri.substring(0, 5) == "/del/")
+        return handleDelRecipe(client, uri);
 
     return sendFromSDCard(client, uri);
 }

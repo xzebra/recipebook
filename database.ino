@@ -55,10 +55,18 @@ int readPeople(File &db) {
     return people;
 }
 
-void storeIngredient(File &db, const char ingredient[]) {
-    db.write(ingredient, MAX_INGREDIENT_LEN);
+void storeIngredients(File &db, const char ingredients[]) {
+    db.write(ingredients, MAX_INGREDIENT_LEN*MAX_INGREDIENTS);
 }
 
-void storeStep(File &db, char step[]) {
-    db.write(step, MAX_STEP_LEN);
+void readIngredients(File &db, char ingredients[]) {
+    db.readBytes(ingredients, MAX_INGREDIENT_LEN*MAX_INGREDIENTS);
+}
+
+void storeSteps(File &db, const char steps[]) {
+    db.write(steps, MAX_STEP_LEN*MAX_STEPS);
+}
+
+void readSteps(File &db, char steps[]) {
+    db.readBytes(steps, MAX_STEP_LEN*MAX_STEPS);
 }
